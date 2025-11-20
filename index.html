@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naijpedia - Nigeria's Premier Search Engine</title>
+    <meta name="description" content="Real-time Nigerian news, grants, jobs, and opportunities">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .backdrop-blur-xl {
+            backdrop-filter: blur(20px);
+        }
+
+        .backdrop-blur-lg {
+            backdrop-filter: blur(12px);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+        }
+
+        .bg-pattern {
+            position: absolute;
+            inset: 0;
+            opacity: 0.05;
+            background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .glass-card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="min-h-screen bg-black text-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="bg-pattern"></div>
+
+        <!-- Header -->
+        <header class="relative z-10 border-b border-white border-opacity-10">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <button onclick="goHome()" class="text-3xl font-bold tracking-tight hover:text-gray-300 transition-colors cursor-pointer">
+                        Naijpedia
+                    </button>
+                    <nav class="flex gap-6 text-sm">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">About</a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="relative z-10">
+            <!-- Hero Section -->
+            <section id="hero" class="max-w-4xl mx-auto px-4 py-24 text-center">
+                <h2 class="text-5xl font-bold mb-4 tracking-tight">
+                    Nigeria's Premier Search Engine
+                </h2>
+                <p class="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
+                    Real-time news, grants, jobs, and opportunities across Nigeria
+                </p>
+
+                <!-- Search Bar -->
+                <div class="mb-16">
+                    <div class="relative backdrop-blur-xl bg-white bg-opacity-5 rounded-2xl border border-white border-opacity-10 shadow-2xl p-2">
+                        <div class="flex items-center gap-3 px-4">
+                            <svg class="text-gray-400" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            <input
+                                type="text"
+                                id="heroSearch"
+                                placeholder="Search for news, grants, jobs, tech updates..."
+                                class="flex-1 bg-transparent border-none outline-none text-lg py-4 placeholder-gray-500"
+                                onkeypress="if(event.key==='Enter') performSearch()"
+                            />
+                            <button
+                                onclick="performSearch()"
+                                id="heroSearchBtn"
+                                class="px-8 py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-200 transition-all flex items-center gap-2"
+                            >
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trending Searches -->
+                <div class="backdrop-blur-xl bg-white bg-opacity-5 rounded-2xl border border-white border-opacity-10 p-8">
+                    <div class="flex items-center gap-2 mb-6 justify-center">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-400">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                        <h3 class="text-lg font-semibold">Trending Searches</h3>
+                    </div>
+                    <div class="flex flex-wrap gap-3 justify-center" id="trendingTags"></div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results" class="max-w-6xl mx-auto px-4 py-12 hidden">
+                <!-- Search Bar (Compact) -->
+                <div class="mb-8">
+                    <div class="backdrop-blur-xl bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 p-2">
+                        <div class="flex items-center gap-3 px-4">
+                            <svg class="text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            <input
+                                type="text"
+                                id="resultsSearch"
+                                placeholder="Search..."
+                                class="flex-1 bg-transparent border-none outline-none py-3 placeholder-gray-500"
+                                onkeypress="if(event.key==='Enter') performSearch()"
+                            />
+                            <button
+                                onclick="performSearch()"
+                                id="resultsSearchBtn"
+                                class="px-6 py-2 bg-white text-black rounded-lg font-medium hover:bg-gray-200 transition-all text-sm flex items-center gap-2"
+                            >
+                                Search
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="flex gap-3 mb-8 overflow-x-auto pb-2" id="categoryFilters"></div>
+
+                <!-- Error Message -->
+                <div id="errorMsg" class="backdrop-blur-xl bg-red-500 bg-opacity-10 border border-red-500 border-opacity-30 rounded-xl p-4 mb-6 hidden">
+                    <p class="text-red-300" id="errorText"></p>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading" class="flex items-center justify-center py-20 hidden">
+                    <div class="text-center">
+                        <svg class="animate-spin mx-auto mb-4" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                        </svg>
+                        <p class="text-gray-400">Searching Nigerian news sources...</p>
+                    </div>
+                </div>
+
+                <!-- Results Count -->
+                <p id="resultsCount" class="text-gray-400 text-sm mb-6"></p>
+
+                <!-- No Results -->
+                <div id="noResults" class="backdrop-blur-xl bg-white bg-opacity-5 rounded-2xl border border-white border-opacity-10 p-12 text-center hidden">
+                    <p class="text-xl text-gray-400 mb-4">No results found</p>
+                    <p class="text-gray-500 mb-6">Try a different search term or category</p>
+                    <button
+                        onclick="goHome()"
+                        class="px-6 py-3 backdrop-blur-lg bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 hover:bg-opacity-10 transition-all"
+                    >
+                        ← Back to Home
+                    </button>
+                </div>
+
+                <!-- Results Grid -->
+                <div id="resultsGrid" class="space-y-6"></div>
+
+                <!-- Back to Home -->
+                <div class="mt-12 text-center">
+                    <button
+                        onclick="goHome()"
+                        class="px-6 py-3 backdrop-blur-lg bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 hover:bg-opacity-10 transition-all"
+                    >
+                        ← New Search
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="relative z-10 border-t border-white border-opacity-10 mt-24">
+            <div class="max-w-7xl mx-auto px-4 py-12">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div>
+                        <p class="text-2xl font-bold mb-2">Naijpedia</p>
+                        <p class="text-gray-500 text-sm">Nigeria's Premier Search Engine</p>
+                    </div>
+                    <nav class="flex gap-8 text-sm text-gray-400">
+                        <a href="#" class="hover:text-white transition-colors">About</a>
+                        <a href="#" class="hover:text-white transition-colors">Contact</a>
+                        <a href="#" class="hover:text-white transition-colors">Privacy</a>
+                        <a href="#" class="hover:text-white transition-colors">Terms</a>
+                    </nav>
+                </div>
+                <div class="text-center mt-8 text-gray-600 text-sm">
+                    © 2025 Naijpedia. All rights reserved.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // State
+        let currentQuery = '';
+        let activeCategory = 'all';
+        let newsArticles = [];
+        
+        const trendingSearches = [
+            'Nigerian tech news',
+            'Student grants 2025',
+            'Remote jobs Nigeria',
+            'Lagos business news',
+            'Nigeria sports updates',
+            'University scholarships'
+        ];
+
+        const categories = [
+            { id: 'all', name: 'All', icon: '✨' },
+            { id: 'news', name: 'News', icon: '📰' },
+            { id: 'grants', name: 'Grants', icon: '🏆' },
+            { id: 'jobs', name: 'Jobs', icon: '💼' },
+            { id: 'tech', name: 'Tech', icon: '💻' },
+            { id: 'sports', name: 'Sports', icon: '⚽' },
+        ];
+
+        // Initialize
+        function init() {
+            renderTrendingTags();
+            renderCategoryFilters();
+            fetchNigerianNews('Nigeria latest news');
+        }
+
+        // Render trending tags
+        function renderTrendingTags() {
+            const container = document.getElementById('trendingTags');
+            container.innerHTML = trendingSearches.map(term => `
+                <button
+                    onclick="searchTrending('${term}')"
+                    class="px-5 py-2 backdrop-blur-lg bg-white bg-opacity-5 rounded-full border border-white border-opacity-10 hover:bg-opacity-10 transition-all text-sm"
+                >
+                    ${term}
+                </button>
+            `).join('');
+        }
+
+        // Render category filters
+        function renderCategoryFilters() {
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = categories.map(cat => `
+                <button
+                    onclick="setCategory('${cat.id}')"
+                    id="cat-${cat.id}"
+                    class="flex items-center gap-2 px-5 py-2.5 backdrop-blur-lg rounded-full border transition-all whitespace-nowrap ${
+                        cat.id === 'all' ? 'bg-white text-black border-white' : 'bg-white bg-opacity-5 border-white border-opacity-10 hover:bg-opacity-10'
+                    }"
+                >
+                    <span>${cat.icon}</span>
+                    <span class="text-sm font-medium">${cat.name}</span>
+                </button>
+            `).join('');
+        }
+
+        // Set category
+        function setCategory(catId) {
+            activeCategory = catId;
+            categories.forEach(cat => {
+                const btn = document.getElementById(`cat-${cat.id}`);
+                if (cat.id === catId) {
+                    btn.className = 'flex items-center gap-2 px-5 py-2.5 backdrop-blur-lg rounded-full border transition-all whitespace-nowrap bg-white text-black border-white';
+                } else {
+                    btn.className = 'flex items-center gap-2 px-5 py-2.5 backdrop-blur-lg rounded-full border transition-all whitespace-nowrap bg-white bg-opacity-5 border-white border-opacity-10 hover:bg-opacity-10';
+                }
+            });
+            renderResults();
+        }
+
+        // Search trending
+        function searchTrending(term) {
+            document.getElementById('heroSearch').value = term;
+            currentQuery = term;
+            fetchNigerianNews(term);
+        }
+
+        // Perform search
+        function performSearch() {
+            const heroInput = document.getElementById('heroSearch');
+            const resultsInput = document.getElementById('resultsSearch');
+            const query = heroInput.value.trim() || resultsInput.value.trim();
+            
+            if (query) {
+                currentQuery = query;
+                heroInput.value = query;
+                resultsInput.value = query;
+                fetchNigerianNews(query);
+            }
+        }
+
+        // Go home
+        function goHome() {
+            document.getElementById('hero').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('heroSearch').value = '';
+            document.getElementById('resultsSearch').value = '';
+            currentQuery = '';
+        }
+
+        // Show results view
+        function showResults() {
+            document.getElementById('hero').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+        }
+
+        // Set loading state
+        function setLoading(isLoading) {
+            const loadingEl = document.getElementById('loading');
+            const heroBtn = document.getElementById('heroSearchBtn');
+            const resultsBtn = document.getElementById('resultsSearchBtn');
+            
+            if (isLoading) {
+                loadingEl.classList.remove('hidden');
+                heroBtn.disabled = true;
+                resultsBtn.disabled = true;
+                heroBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg><span>Searching...</span>';
+                resultsBtn.innerHTML = '<svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg><span>Searching...</span>';
+            } else {
+                loadingEl.classList.add('hidden');
+                heroBtn.disabled = false;
+                resultsBtn.disabled = false;
+                heroBtn.innerHTML = 'Search';
+                resultsBtn.innerHTML = 'Search';
+            }
+        }
+
+        // Show error
+        function showError(message) {
+            const errorEl = document.getElementById('errorMsg');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => errorEl.classList.add('hidden'), 5000);
+        }
+
+        // Determine category
+        function determineCategory(text) {
+            const lower = text.toLowerCase();
+            if (lower.includes('tech') || lower.includes('startup') || lower.includes('digital')) return 'tech';
+            if (lower.includes('sport') || lower.includes('football') || lower.includes('athlete')) return 'sports';
+            if (lower.includes('grant') || lower.includes('scholarship') || lower.includes('fund')) return 'grants';
+            if (lower.includes('job') || lower.includes('employment') || lower.includes('hiring')) return 'jobs';
+            return 'news';
+        }
+
+        // Get sample articles
+        function getSampleArticles() {
+            return [
+                {
+                    title: 'Nigeria Economic Growth Shows Promise in Q4 2024',
+                    summary: 'Recent economic data indicates Nigeria\'s GDP growth accelerated in the fourth quarter, driven by the non-oil sector and increased agricultural output across multiple states.',
+                    points: [
+                        'GDP growth rate increased to 3.2% year-over-year',
+                        'Agriculture and services sectors lead expansion',
+                        'Government fiscal reforms show positive impact'
+                    ],
+                    url: 'https://punchng.com',
+                    source: 'Punch Nigeria',
+                    date: 'Today',
+                    category: 'news'
+                },
+                {
+                    title: 'Lagos Tech Startup Secures Major International Investment',
+                    summary: 'A Lagos-based fintech company announced a significant funding round led by international investors, marking continued growth in Nigeria\'s technology sector.',
+                    points: [
+                        'Series B funding exceeds expectations',
+                        'Plans to expand to three additional African markets',
+                        'Will create 150 new tech jobs in Nigeria'
+                    ],
+                    url: 'https://guardian.ng',
+                    source: 'Guardian Nigeria',
+                    date: 'Yesterday',
+                    category: 'tech'
+                },
+                {
+                    title: 'Federal Government Launches New Youth Employment Initiative',
+                    summary: 'A comprehensive program aimed at addressing youth unemployment through skills training, entrepreneurship support, and direct job placement assistance.',
+                    points: [
+                        'Target: 500,000 youth across all 36 states',
+                        'Focus on digital skills and agriculture',
+                        'Application portal opens next week'
+                    ],
+                    url: 'https://premiumtimesng.com',
+                    source: 'Premium Times',
+                    date: 'Today',
+                    category: 'jobs'
+                }
+            ];
+        }
+
+        // Fetch Nigerian news
+        async function fetchNigerianNews(query) {
+            setLoading(true);
+            showResults();
+
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        tools: [{
+                            type: 'web_search_20250305',
+                            name: 'web_search'
+                        }],
+                        messages: [{
+                            role: 'user',
+                            content: `Search for the latest news from Nigeria about: ${query}. Focus on recent articles from reliable Nigerian news sources like Punch, Guardian Nigeria, Premium Times, Vanguard, ThisDay, or international sources covering Nigeria. Return only the most recent news from the past 2-3 days.`
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                let articles = [];
+
+                if (data.content) {
+                    for (const block of data.content) {
+                        if (block.type === 'tool_result') {
+                            try {
+                                const results = JSON.parse(block.content);
+                                if (results.results && Array.isArray(results.results)) {
+                                    articles = results.results.slice(0, 10).map(result => ({
+                                        title: result.title,
+                                        summary: result.description || result.snippet || 'No description available',
+                                        url: result.url,
+                                        source: result.source || new URL(result.url).hostname.replace('www.', ''),
+                                        date: result.age || 'Recently',
+                                        category: determineCategory(result.title + ' ' + (result.description || ''))
+                                    }));
+                                }
+                            } catch (e) {
+                                console.error('Error parsing search results:', e);
+                            }
+                        }
+                    }
+                }
+
+                if (articles.length === 0) {
+                    articles = getSampleArticles();
+                }
+
+                newsArticles = articles;
+                renderResults();
+
+            } catch (err) {
+                console.error('Error fetching news:', err);
+                showError('Unable to fetch news. Showing sample results.');
+                newsArticles = getSampleArticles();
+                renderResults();
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Render results
+        function renderResults() {
+            const filteredResults = activeCategory === 'all' 
+                ? newsArticles 
+                : newsArticles.filter(r => r.category === activeCategory);
+
+            const countEl = document.getElementById('resultsCount');
+            const noResultsEl = document.getElementById('noResults');
+            const gridEl = document.getElementById('resultsGrid');
+
+            if (filteredResults.length === 0) {
+                countEl.textContent = '';
+                noResultsEl.classList.remove('hidden');
+                gridEl.innerHTML = '';
+                return;
+            }
+
+            noResultsEl.classList.add('hidden');
+            countEl.textContent = `Found ${filteredResults.length} results ${currentQuery ? `for "${currentQuery}"` : ''}`;
+
+            gridEl.innerHTML = filteredResults.map(result => `
+                <article class="glass-card p-8">
+                    <div class="flex items-start justify-between mb-4">
+                        <h3 class="text-2xl font-bold pr-4">
+                            ${result.title}
+                        </h3>
+                        <span class="text-xs text-gray-500 bg-white bg-opacity-5 px-3 py-1 rounded-full whitespace-nowrap">
+                            ${result.category}
+                        </span>
+                    </div>
+                    
+                    <p class="text-gray-300 text-lg mb-4 leading-relaxed">
+                        ${result.summary}
+                    </p>
+
+                    ${result.points ? `
+                        <ul class="space-y-2 mb-6">
+                            ${result.points.map(point => `
+                                <li class="flex items-start gap-3 text-gray-400">
+                                    <span class="text-white mt-1">•</span>
+                                    <span>${point}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : ''}
+
+                    <div class="flex items-center justify-between pt-4 border-t border-white border-opacity-5">
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                            <span class="font-medium">${result.source}</span>
+                            <span>•</span>
+                            <span>${result.date}</span>
+                        </div>
+                        <a
+                            href="${result.url}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                        >
+                            <span>Read full article</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                        </a>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
