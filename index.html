@@ -11,32 +11,19 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif; background: #000; color: #fff; overflow-x: hidden; min-height: 100vh; }
     .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); }
     .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3); transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
-    .glass-card:hover { transform: translateY(-4px); background: rgba(255,255,255,0.08); box-shadow: 0 12px 40px 0 rgba(0,0,0,0.5); }
     .thumbnail { width: 100%; height: 220px; object-fit: cover; border-radius: 16px; }
-    .gradient-text { background: linear-gradient(135deg, #fff 0%, #999 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    @keyframes spin { to { transform: rotate(360deg); } }
     .animate-spin { animation: spin 1s linear infinite; }
-    input:focus { outline: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .hidden { display: none !important; }
-    .search-container { position: sticky; top: 0; z-index: 50; padding: 1rem 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .category-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .badge-news { background: rgba(255,255,255,0.2); color: white; }
-    .badge-tech { background: rgba(255,255,255,0.2); color: white; }
-    .badge-sports { background: rgba(255,255,255,0.2); color: white; }
-    .badge-grants { background: rgba(255,255,255,0.2); color: white; }
-    .badge-jobs { background: rgba(255,255,255,0.2); color: white; }
-    .fade-in { animation: fadeIn 0.5s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-    /* small utility for line clamp fallback */
     .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   </style>
 </head>
 <body>
   <div class="min-h-screen">
-    <!-- Header -->
+    <!-- header / search / content (same structure as before) -->
     <header class="search-container">
       <div class="max-w-7xl mx-auto px-4">
         <div class="flex flex-col gap-4">
@@ -45,111 +32,59 @@
             <p class="text-white text-opacity-80 text-sm hidden md:block">Your Gateway to Nigerian Information</p>
           </div>
 
-          <!-- Knowledge Search Bar -->
           <div class="glass rounded-2xl p-1.5">
             <div class="flex items-center gap-3 px-4">
-              <svg class="text-white" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <svg class="text-white" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
               </svg>
-              <input
-                type="text"
-                id="searchInput"
-                placeholder="Search for knowledge, history, people, culture..."
-                class="flex-1 bg-transparent border-none outline-none py-3 text-white placeholder-gray-400"
-                onkeypress="if(event.key==='Enter') performKnowledgeSearch()"
-              />
-              <button
-                onclick="performKnowledgeSearch()"
-                id="searchBtn"
-                class="px-6 py-2.5 bg-white text-black rounded-xl font-medium hover:bg-gray-200 transition-all flex items-center gap-2"
-              >
-                <span>Search</span>
-              </button>
+              <input id="searchInput" type="text" placeholder="Search for knowledge, history, people, culture..." class="flex-1 bg-transparent border-none outline-none py-3 text-white placeholder-gray-400" onkeypress="if(event.key==='Enter') performKnowledgeSearch()" />
+              <button id="searchBtn" onclick="performKnowledgeSearch()" class="px-6 py-2.5 bg-white text-black rounded-xl font-medium hover:bg-gray-200 transition-all">Search</button>
             </div>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8">
-      <!-- Knowledge Results Section -->
       <section id="knowledgeResults" class="mb-12 hidden">
-        <button onclick="closeKnowledgeSearch()" class="mb-6 glass text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-white hover:bg-opacity-10 transition-all">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-          Back to News
-        </button>
-
-        <!-- AI Overview -->
+        <button onclick="closeKnowledgeSearch()" class="mb-6 glass text-white px-4 py-2 rounded-xl">Back to News</button>
         <div class="glass-card p-8 mb-8">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-xl bg-white bg-opacity-10 flex items-center justify-center">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                <path d="M12 6.253v13"></path>
-              </svg>
-            </div>
-            <h2 class="text-2xl font-bold text-white">AI Overview</h2>
-          </div>
+          <h2 class="text-2xl font-bold text-white">AI Overview</h2>
           <div id="aiOverview" class="text-gray-300 text-lg leading-relaxed"></div>
         </div>
-
-        <!-- Wikipedia Results -->
         <div id="wikiResults" class="space-y-6"></div>
       </section>
 
-      <!-- Latest News Section -->
       <section id="newsSection">
         <div class="flex items-center justify-between mb-8">
           <h2 class="text-3xl font-bold text-white">Latest Nigerian News</h2>
-          <button onclick="refreshNews()" class="glass text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-white hover:bg-opacity-10 transition-all">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-            </svg>
-            Refresh
-          </button>
+          <button onclick="refreshNews()" class="glass text-white px-4 py-2 rounded-xl">Refresh</button>
         </div>
 
-        <!-- Loading State -->
         <div id="newsLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div class="glass-card p-6">
             <div class="shimmer h-48 rounded-xl mb-4"></div>
             <div class="shimmer h-6 rounded mb-2"></div>
             <div class="shimmer h-4 rounded w-3/4"></div>
           </div>
-          <div class="glass-card p-6 hidden md:block">
-            <div class="shimmer h-48 rounded-xl mb-4"></div>
-            <div class="shimmer h-6 rounded mb-2"></div>
-            <div class="shimmer h-4 rounded w-3/4"></div>
-          </div>
-          <div class="glass-card p-6 hidden lg:block">
-            <div class="shimmer h-48 rounded-xl mb-4"></div>
-            <div class="shimmer h-6 rounded mb-2"></div>
-            <div class="shimmer h-4 rounded w-3/4"></div>
-          </div>
         </div>
 
-        <!-- News Grid -->
         <div id="newsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden"></div>
-
-        <!-- Error Message -->
         <div id="newsError" class="glass-card p-8 text-center hidden">
           <p class="text-gray-300 text-lg mb-4">Unable to load news at the moment</p>
-          <button onclick="refreshNews()" class="px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-200 transition-all">Try Again</button>
+          <button onclick="refreshNews()" class="px-6 py-3 bg-white text-black rounded-xl">Try Again</button>
         </div>
       </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-24 py-8 border-t border-white border-opacity-20">
-      <div class="max-w-7xl mx-auto px-4 text-center">
-        <p class="text-white text-opacity-80 text-sm">© 2025 Naijpedia. All rights reserved.</p>
-      </div>
+    <footer class="mt-24 py-8 border-t border-white border-opacity-20 text-center">
+      <p class="text-white text-opacity-80 text-sm">© 2025 Naijpedia. All rights reserved.</p>
     </footer>
   </div>
 
   <script>
-    // Client-side JS: uses your backend endpoints (/api/news and /api/ai-summary)
+    // Client JS: calls your server endpoints (no API keys here)
     let allNews = [];
 
     async function init() { await fetchLatestNews(); }
@@ -164,51 +99,46 @@
       newsError.classList.add('hidden');
 
       try {
-        const resp = await fetch(`/api/news?country=ng&language=en&size=15`);
+        const resp = await fetch('/api/news?country=ng&language=en&size=15');
         if (!resp.ok) throw new Error('News proxy error');
         const data = await resp.json();
-
         if (!data.results || data.results.length === 0) throw new Error('No news available');
 
         allNews = data.results
-          .filter(article => article.title && article.title !== '[Removed]')
-          .map(article => ({
-            title: article.title,
-            description: article.description || 'Read more at source',
-            url: article.link,
-            source: article.source_id || 'News Source',
-            date: formatDate(article.pubDate),
-            image: article.image_url,
-            category: determineCategory(article.title + ' ' + (article.description || '') + ' ' + (article.category ? article.category.join(' ') : ''))
+          .filter(a => a.title && a.title !== '[Removed]')
+          .map(a => ({
+            title: a.title,
+            description: a.description || 'Read more at source',
+            url: a.link,
+            source: a.source_id || 'News Source',
+            date: formatDate(a.pubDate),
+            image: a.image_url,
+            category: determineCategory(a.title + ' ' + (a.description || ''))
           }));
 
         renderNews();
       } catch (err) {
         console.error('Error fetching news:', err);
-        newsLoading.classList.add('hidden');
-        newsError.classList.remove('hidden');
+        document.getElementById('newsLoading').classList.add('hidden');
+        document.getElementById('newsError').classList.remove('hidden');
       }
     }
 
     function renderNews() {
       const newsLoading = document.getElementById('newsLoading');
       const newsGrid = document.getElementById('newsGrid');
-
       newsLoading.classList.add('hidden');
       newsGrid.classList.remove('hidden');
 
-      newsGrid.innerHTML = allNews.map((article, index) => `
-        <article class="glass-card p-6 fade-in" style="animation-delay: ${index * 0.05}s">
+      newsGrid.innerHTML = allNews.map((article, i) => `
+        <article class="glass-card p-6" style="animation-delay:${i * 0.05}s">
           ${article.image ? `<img src="${escapeAttr(article.image)}" alt="${escapeHtml(article.title)}" class="thumbnail mb-4" onerror="this.style.display='none'">` : ''}
           <div class="mb-3"><span class="category-badge badge-${article.category}">${escapeHtml(article.category)}</span></div>
           <h3 class="text-xl font-bold text-white mb-3 line-clamp-2">${escapeHtml(article.title)}</h3>
-          <p class="text-gray-300 mb-4 line-clamp-3 text-sm leading-relaxed">${escapeHtml(article.description)}</p>
+          <p class="text-gray-300 mb-4 line-clamp-3">${escapeHtml(article.description)}</p>
           <div class="flex items-center justify-between pt-4 border-t border-white border-opacity-10">
-            <div class="flex flex-col gap-1">
-              <span class="text-xs font-semibold text-white">${escapeHtml(article.source)}</span>
-              <span class="text-xs text-gray-400">${escapeHtml(article.date)}</span>
-            </div>
-            <a href="${escapeAttr(article.url)}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-gray-200 transition-all flex items-center gap-2">Read</a>
+            <div><span class="text-xs font-semibold text-white">${escapeHtml(article.source)}</span><br/><span class="text-xs text-gray-400">${escapeHtml(article.date)}</span></div>
+            <a href="${escapeAttr(article.url)}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-white text-black rounded-lg">Read</a>
           </div>
         </article>
       `).join('');
@@ -217,55 +147,39 @@
     function refreshNews() { fetchLatestNews(); }
 
     async function performKnowledgeSearch() {
-      const searchInput = document.getElementById('searchInput');
-      const query = searchInput.value.trim();
+      const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
-
-      const newsSection = document.getElementById('newsSection');
-      const knowledgeResults = document.getElementById('knowledgeResults');
-      const aiOverview = document.getElementById('aiOverview');
-      const wikiResults = document.getElementById('wikiResults');
-
-      newsSection.classList.add('hidden');
-      knowledgeResults.classList.remove('hidden');
-
-      aiOverview.innerHTML = '<div class="flex items-center gap-3"><svg class="animate-spin" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg> Generating overview...</div>';
-      wikiResults.innerHTML = '<div class="text-center py-8"><svg class="animate-spin mx-auto" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg> Searching Wikipedia...</div>';
+      document.getElementById('newsSection').classList.add('hidden');
+      document.getElementById('knowledgeResults').classList.remove('hidden');
+      document.getElementById('aiOverview').innerHTML = '<div class="animate-spin">Generating...</div>';
+      document.getElementById('wikiResults').innerHTML = '<div class="animate-spin">Searching Wikipedia...</div>';
 
       try {
         const wikiData = await searchWikipedia(query);
-
         const aiResp = await fetch('/api/ai-summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, wikiResults: wikiData })
         });
-
         if (!aiResp.ok) throw new Error('AI summary proxy error');
         const aiJson = await aiResp.json();
-        aiOverview.textContent = aiJson.summary || (wikiData.length > 0 ? `Found ${wikiData.length} Wikipedia articles about "${query}".` : `No detailed information available for "${query}".`);
+        document.getElementById('aiOverview').textContent = aiJson.summary || (wikiData.length ? `Found ${wikiData.length} Wikipedia articles.` : `No detailed info available.`);
 
-        if (wikiData.length > 0) {
-          wikiResults.innerHTML = `
-            <h3 class="text-2xl font-bold text-white mb-6">Related Articles</h3>
-            <div class="space-y-4">
-              ${wikiData.map(result => `
-                <div class="glass-card p-6">
-                  <h4 class="text-xl font-bold text-white mb-3">${escapeHtml(result.title)}</h4>
-                  <p class="text-gray-300 mb-4 leading-relaxed">${escapeHtml(result.snippet)}</p>
-                  <a href="${escapeAttr(result.url)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-gray-200 transition-all">Read on Wikipedia</a>
-                </div>
-              `).join('')}
+        if (wikiData.length) {
+          document.getElementById('wikiResults').innerHTML = wikiData.map(r => `
+            <div class="glass-card p-6">
+              <h4 class="text-xl font-bold text-white mb-3">${escapeHtml(r.title)}</h4>
+              <p class="text-gray-300 mb-4">${escapeHtml(r.snippet)}</p>
+              <a href="${escapeAttr(r.url)}" target="_blank" class="px-4 py-2 bg-white text-black rounded-lg">Read on Wikipedia</a>
             </div>
-          `;
+          `).join('');
         } else {
-          wikiResults.innerHTML = '<div class="glass-card p-8 text-center"><p class="text-gray-300">No Wikipedia articles found for this query.</p></div>';
+          document.getElementById('wikiResults').innerHTML = '<div class="glass-card p-8 text-center"><p class="text-gray-300">No Wikipedia articles found for this query.</p></div>';
         }
-
       } catch (err) {
         console.error('Knowledge search error:', err);
-        aiOverview.textContent = 'Unable to generate overview at this time.';
-        wikiResults.innerHTML = '<div class="glass-card p-8 text-center"><p class="text-gray-300">Unable to fetch articles. Please try again.</p></div>';
+        document.getElementById('aiOverview').textContent = 'Unable to generate overview at this time.';
+        document.getElementById('wikiResults').innerHTML = '<div class="glass-card p-8">Unable to fetch articles. Please try again.</div>';
       }
     }
 
@@ -278,14 +192,10 @@
     async function searchWikipedia(query) {
       try {
         const endpoint = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=5`;
-        const response = await fetch(endpoint);
-        const data = await response.json();
+        const resp = await fetch(endpoint);
+        const data = await resp.json();
         if (!data.query || !data.query.search) return [];
-        return data.query.search.map(result => ({
-          title: result.title,
-          snippet: result.snippet.replace(/<[^>]*>/g, ''),
-          url: `https://en.wikipedia.org/wiki/${encodeURIComponent(result.title.replace(/ /g, '_'))}`
-        }));
+        return data.query.search.map(r => ({ title: r.title, snippet: r.snippet.replace(/<[^>]*>/g, ''), url: `https://en.wikipedia.org/wiki/${encodeURIComponent(r.title.replace(/ /g, '_'))}` }));
       } catch (err) {
         console.error('Wikipedia search error:', err);
         return [];
@@ -301,36 +211,23 @@
       return 'news';
     }
 
-    function formatDate(dateString) {
-      if (!dateString) return 'Recently';
+    function formatDate(d) {
+      if (!d) return 'Recently';
       try {
-        const date = new Date(dateString);
+        const date = new Date(d);
         if (isNaN(date.getTime())) return 'Recently';
         const now = new Date();
-        const diffTime = Math.abs(now - date);
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.floor((now - date) / (1000*60*60*24));
         if (diffDays === 0) return 'Today';
         if (diffDays === 1) return 'Yesterday';
         if (diffDays < 7) return `${diffDays} days ago`;
         if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      } catch (e) { return 'Recently'; }
+        return date.toLocaleDateString();
+      } catch(e) { return 'Recently'; }
     }
 
-    // Small helpers to avoid XSS when injecting into template strings
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-    function escapeAttr(url) {
-      if (!url) return '#';
-      return String(url).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
+    function escapeHtml(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : ''; }
+    function escapeAttr(s) { return s ? String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '#'; }
 
     init();
   </script>
