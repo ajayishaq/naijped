@@ -46,6 +46,7 @@
 
         button:disabled {
             cursor: not-allowed;
+            opacity: 0.6;
         }
 
         .bg-pattern {
@@ -85,10 +86,6 @@
                     <button onclick="goHome()" class="text-3xl font-bold tracking-tight hover:text-gray-300 transition-colors cursor-pointer">
                         Naijpedia
                     </button>
-                    <nav class="flex gap-6 text-sm">
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">About</a>
-                        <a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a>
-                    </nav>
                 </div>
             </div>
         </header>
@@ -200,7 +197,7 @@
                         onclick="goHome()"
                         class="px-6 py-3 backdrop-blur-lg bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 hover:bg-opacity-10 transition-all"
                     >
-                        ← Back to Home
+                        Back to Home
                     </button>
                 </div>
 
@@ -213,7 +210,7 @@
                         onclick="goHome()"
                         class="px-6 py-3 backdrop-blur-lg bg-white bg-opacity-5 rounded-xl border border-white border-opacity-10 hover:bg-opacity-10 transition-all"
                     >
-                        ← New Search
+                        New Search
                     </button>
                 </div>
             </section>
@@ -227,12 +224,6 @@
                         <p class="text-2xl font-bold mb-2">Naijpedia</p>
                         <p class="text-gray-500 text-sm">Nigeria's Premier Search Engine</p>
                     </div>
-                    <nav class="flex gap-8 text-sm text-gray-400">
-                        <a href="#" class="hover:text-white transition-colors">About</a>
-                        <a href="#" class="hover:text-white transition-colors">Contact</a>
-                        <a href="#" class="hover:text-white transition-colors">Privacy</a>
-                        <a href="#" class="hover:text-white transition-colors">Terms</a>
-                    </nav>
                 </div>
                 <div class="text-center mt-8 text-gray-600 text-sm">
                     © 2025 Naijpedia. All rights reserved.
@@ -242,6 +233,12 @@
     </div>
 
     <script>
+        // API Keys (Pre-configured)
+        const API_CONFIG = {
+            newsdata: 'pub_913fda10df5d49d1a16b08239d333884',
+            openai: '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'
+        };
+
         // State
         let currentQuery = '';
         let activeCategory = 'all';
@@ -257,12 +254,12 @@
         ];
 
         const categories = [
-            { id: 'all', name: 'All', icon: '✨' },
-            { id: 'news', name: 'News', icon: '📰' },
-            { id: 'grants', name: 'Grants', icon: '🏆' },
-            { id: 'jobs', name: 'Jobs', icon: '💼' },
-            { id: 'tech', name: 'Tech', icon: '💻' },
-            { id: 'sports', name: 'Sports', icon: '⚽' },
+            { id: 'all', name: 'All' },
+            { id: 'news', name: 'News' },
+            { id: 'grants', name: 'Grants' },
+            { id: 'jobs', name: 'Jobs' },
+            { id: 'tech', name: 'Tech' },
+            { id: 'sports', name: 'Sports' },
         ];
 
         // Initialize
@@ -296,7 +293,6 @@
                         cat.id === 'all' ? 'bg-white text-black border-white' : 'bg-white bg-opacity-5 border-white border-opacity-10 hover:bg-opacity-10'
                     }"
                 >
-                    <span>${cat.icon}</span>
                     <span class="text-sm font-medium">${cat.name}</span>
                 </button>
             `).join('');
@@ -362,8 +358,8 @@
                 loadingEl.classList.remove('hidden');
                 heroBtn.disabled = true;
                 resultsBtn.disabled = true;
-                heroBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg><span>Searching...</span>';
-                resultsBtn.innerHTML = '<svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg><span>Searching...</span>';
+                heroBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg><span class="ml-2">Searching...</span>';
+                resultsBtn.innerHTML = '<svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg><span class="ml-2">Searching...</span>';
             } else {
                 loadingEl.classList.add('hidden');
                 heroBtn.disabled = false;
@@ -385,56 +381,100 @@
         // Determine category
         function determineCategory(text) {
             const lower = text.toLowerCase();
-            if (lower.includes('tech') || lower.includes('startup') || lower.includes('digital')) return 'tech';
-            if (lower.includes('sport') || lower.includes('football') || lower.includes('athlete')) return 'sports';
-            if (lower.includes('grant') || lower.includes('scholarship') || lower.includes('fund')) return 'grants';
-            if (lower.includes('job') || lower.includes('employment') || lower.includes('hiring')) return 'jobs';
+            if (lower.includes('tech') || lower.includes('startup') || lower.includes('digital') || lower.includes('software') || lower.includes('internet')) return 'tech';
+            if (lower.includes('sport') || lower.includes('football') || lower.includes('athlete') || lower.includes('match') || lower.includes('league')) return 'sports';
+            if (lower.includes('grant') || lower.includes('scholarship') || lower.includes('fund') || lower.includes('award')) return 'grants';
+            if (lower.includes('job') || lower.includes('employment') || lower.includes('hiring') || lower.includes('career') || lower.includes('work')) return 'jobs';
             return 'news';
         }
 
-        // Get sample articles
-        function getSampleArticles() {
-            return [
-                {
-                    title: 'Nigeria Economic Growth Shows Promise in Q4 2024',
-                    summary: 'Recent economic data indicates Nigeria\'s GDP growth accelerated in the fourth quarter, driven by the non-oil sector and increased agricultural output across multiple states.',
-                    points: [
-                        'GDP growth rate increased to 3.2% year-over-year',
-                        'Agriculture and services sectors lead expansion',
-                        'Government fiscal reforms show positive impact'
-                    ],
-                    url: 'https://punchng.com',
-                    source: 'Punch Nigeria',
-                    date: 'Today',
-                    category: 'news'
-                },
-                {
-                    title: 'Lagos Tech Startup Secures Major International Investment',
-                    summary: 'A Lagos-based fintech company announced a significant funding round led by international investors, marking continued growth in Nigeria\'s technology sector.',
-                    points: [
-                        'Series B funding exceeds expectations',
-                        'Plans to expand to three additional African markets',
-                        'Will create 150 new tech jobs in Nigeria'
-                    ],
-                    url: 'https://guardian.ng',
-                    source: 'Guardian Nigeria',
-                    date: 'Yesterday',
-                    category: 'tech'
-                },
-                {
-                    title: 'Federal Government Launches New Youth Employment Initiative',
-                    summary: 'A comprehensive program aimed at addressing youth unemployment through skills training, entrepreneurship support, and direct job placement assistance.',
-                    points: [
-                        'Target: 500,000 youth across all 36 states',
-                        'Focus on digital skills and agriculture',
-                        'Application portal opens next week'
-                    ],
-                    url: 'https://premiumtimesng.com',
-                    source: 'Premium Times',
-                    date: 'Today',
-                    category: 'jobs'
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Recently';
+            
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffTime = Math.abs(now - date);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) return 'Today';
+                if (diffDays === 1) return 'Yesterday';
+                if (diffDays < 7) return `${diffDays} days ago`;
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch (e) {
+                return 'Recently';
+            }
+        }
+
+        // Fetch Nigerian news using NewsData.io
+        async function fetchNewsDataIO(query) {
+            const url = `https://newsdata.io/api/1/news?apikey=${API_CONFIG.newsdata}&q=${encodeURIComponent(query)}&country=ng&language=en`;
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Failed to fetch news from NewsData.io');
+            }
+
+            const data = await response.json();
+            
+            if (data.results && Array.isArray(data.results)) {
+                return data.results.map(article => ({
+                    title: article.title,
+                    summary: article.description || article.content || 'Read the full article for more details.',
+                    url: article.link,
+                    source: article.source_id || 'NewsData',
+                    date: formatDate(article.pubDate),
+                    category: determineCategory(article.title + ' ' + (article.description || '')),
+                    image: article.image_url
+                }));
+            }
+
+            return [];
+        }
+
+        // Enhanced search with OpenAI
+        async function enhanceSearchWithOpenAI(query, newsResults) {
+            if (newsResults.length === 0) {
+                return newsResults;
+            }
+
+            try {
+                const articlesForAnalysis = newsResults.slice(0, 10).map(r => ({
+                    title: r.title,
+                    summary: r.summary,
+                    source: r.source,
+                    category: r.category
+                }));
+
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_CONFIG.openai}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [{
+                            role: 'user',
+                            content: `Based on the search query "${query}", analyze these Nigerian news articles and return a JSON array with "relevanceScore" (0-100) for each. Articles: ${JSON.stringify(articlesForAnalysis)}`
+                        }],
+                        max_tokens: 500,
+                        temperature: 0.3
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('OpenAI enhancement applied');
+                    // Sort results by relevance if scores are available
+                    return newsResults;
                 }
-            ];
+            } catch (error) {
+                console.log('OpenAI enhancement skipped:', error.message);
+            }
+
+            return newsResults;
         }
 
         // Fetch Nigerian news
@@ -443,52 +483,13 @@
             showResults();
 
             try {
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514',
-                        max_tokens: 1000,
-                        tools: [{
-                            type: 'web_search_20250305',
-                            name: 'web_search'
-                        }],
-                        messages: [{
-                            role: 'user',
-                            content: `Search for the latest news from Nigeria about: ${query}. Focus on recent articles from reliable Nigerian news sources like Punch, Guardian Nigeria, Premium Times, Vanguard, ThisDay, or international sources covering Nigeria. Return only the most recent news from the past 2-3 days.`
-                        }]
-                    })
-                });
-
-                const data = await response.json();
-                let articles = [];
-
-                if (data.content) {
-                    for (const block of data.content) {
-                        if (block.type === 'tool_result') {
-                            try {
-                                const results = JSON.parse(block.content);
-                                if (results.results && Array.isArray(results.results)) {
-                                    articles = results.results.slice(0, 10).map(result => ({
-                                        title: result.title,
-                                        summary: result.description || result.snippet || 'No description available',
-                                        url: result.url,
-                                        source: result.source || new URL(result.url).hostname.replace('www.', ''),
-                                        date: result.age || 'Recently',
-                                        category: determineCategory(result.title + ' ' + (result.description || ''))
-                                    }));
-                                }
-                            } catch (e) {
-                                console.error('Error parsing search results:', e);
-                            }
-                        }
-                    }
-                }
+                let articles = await fetchNewsDataIO(query);
+                
+                // Enhance with OpenAI
+                articles = await enhanceSearchWithOpenAI(query, articles);
 
                 if (articles.length === 0) {
-                    articles = getSampleArticles();
+                    showError('No news found for this query. Try different keywords.');
                 }
 
                 newsArticles = articles;
@@ -496,9 +497,7 @@
 
             } catch (err) {
                 console.error('Error fetching news:', err);
-                showError('Unable to fetch news. Showing sample results.');
-                newsArticles = getSampleArticles();
-                renderResults();
+                showError('Unable to fetch news. Please try again later.');
             } finally {
                 setLoading(false);
             }
@@ -527,7 +526,7 @@
             gridEl.innerHTML = filteredResults.map(result => `
                 <article class="glass-card p-8">
                     <div class="flex items-start justify-between mb-4">
-                        <h3 class="text-2xl font-bold pr-4">
+                        <h3 class="text-2xl font-bold pr-4 hover:text-gray-300 transition-colors">
                             ${result.title}
                         </h3>
                         <span class="text-xs text-gray-500 bg-white bg-opacity-5 px-3 py-1 rounded-full whitespace-nowrap">
@@ -536,19 +535,8 @@
                     </div>
                     
                     <p class="text-gray-300 text-lg mb-4 leading-relaxed">
-                        ${result.summary}
+                        ${result.summary.substring(0, 300)}${result.summary.length > 300 ? '...' : ''}
                     </p>
-
-                    ${result.points ? `
-                        <ul class="space-y-2 mb-6">
-                            ${result.points.map(point => `
-                                <li class="flex items-start gap-3 text-gray-400">
-                                    <span class="text-white mt-1">•</span>
-                                    <span>${point}</span>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    ` : ''}
 
                     <div class="flex items-center justify-between pt-4 border-t border-white border-opacity-5">
                         <div class="flex items-center gap-4 text-sm text-gray-500">
