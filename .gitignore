@@ -1,0 +1,56 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+out/
+*.local
+
+# Logs
+logs/
+*.log
+logs/*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Dependency directories
+/.pnp
+.pnp.js
+
+# Coverage
+coverage/
+coverage-final.json
+
+# Optional npm cache folder
+.npm
+
+# Mac specific
+.DS_Store
+
+# Debug
+debug.log
+
+# Misc
+*.tgz
+
+# Lock files (if you intentionally want them tracked, remove these)
+# package-lock.json
+# yarn.lock
